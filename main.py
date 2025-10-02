@@ -75,6 +75,7 @@ def main():
         settings.avatarsPerTeam = 3;
         settings.randomTeams = true;
         localStorage.setItem('defaultTeambattleS', JSON.stringify(settings));
+        window.dispatchEvent(new Event('storage'));  // Trigger event för att sidan ska uppdatera
         """)
 
         updated_settings = driver.execute_script("""
