@@ -1,11 +1,10 @@
 import os
 import time
 import random
-import json
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -63,27 +62,27 @@ def main():
         time.sleep(2)
         print("Navigated to Teambattle page")
 
-        # 4) Läs och uppdatera Local Storage
-        current_settings = driver.execute_script("""
-        let settings = JSON.parse(localStorage.getItem('defaultTeambattleS')) || {};
-        return settings;
-        """)
-        print("Current Local Storage:", json.dumps(current_settings, indent=2))
+        # ---------- 4) Välj 3 vs 3 i dropdown ----------
+        select_elem = WebDriverWait(driver, WAIT).until(
+            EC.presence_of_element_located((By.ID, "team-battle-type"))
+        )
+        select = Select(select_elem)
+        select.select_by_value("3")  # 3 vs 3
+        print("Selected 3 vs 3 in dropdown")
 
-        driver.execute_script("""
-        let settings = JSON.parse(localStorage.getItem('defaultTeambattleS')) || {};
-        settings.avatarsPerTeam = 3;
-        settings.randomTeams = true;
-        localStorage.setItem('defaultTeambattleS', JSON.stringify(settings));
-        window.dispatchEvent(new Event('storage'));  // Trigger event för att sidan ska uppdatera
-        """)
+        # ---------- 5) Klicka i Slumpade lag om inte redan iklickad ----------
+        checkbox = WebDriverWait(driver, WAIT).until(
+            EC.presence_of_element_located((By.ID, "randomTeams"))
+        )
+        if not checkbox.is_selected():
+            checkbox.click()
+            print("Checked 'Slumpade lag'")
+        else:
+            print("'Slumpade lag' was already checked")
 
-        updated_settings = driver.execute_script("""
-        return JSON.parse(localStorage.getItem('defaultTeambattleS'));
-        """)
-        print("Updated Local Storage:", json.dumps(updated_settings, indent=2))
+        time.sleep(1)  # liten fördröjning innan knappen
 
-        # 5) Klicka på "Skapa lagspel"
+        # ---------- 6) Klicka på 'Skapa lagspel' ----------
         create_button = WebDriverWait(driver, WAIT).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(text(),'Skapa lagspel')]"))
         )
