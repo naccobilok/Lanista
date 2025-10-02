@@ -2,28 +2,31 @@ name: Lanista Auto Teambattle
 
 on:
   schedule:
-    - cron: '*/10 * * * *'  # kör var 10:e minut
-  workflow_dispatch:        # möjliggör manuell start
+    # Kör var 10:e minut mellan 05-23 UTC (06-24 CET normaltid)
+    - cron: "*/10 5-23 * * *"
+  workflow_dispatch:  # Möjliggör manuell start
 
 jobs:
-  create_team:
+  run-teambattle:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
 
-      - name: Setup Python
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.11"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install selenium webdriver-manager
 
-      - name: Run Lanista auto-clicker
+      - name: Run Lanista Auto Clicker
         env:
           EMAIL: ${{ secrets.EMAIL }}
           PASSWORD: ${{ secrets.PASSWORD }}
-        run: python main.py
+        run: |
+          python main.py
