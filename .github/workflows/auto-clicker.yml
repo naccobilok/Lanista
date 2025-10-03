@@ -2,9 +2,8 @@ name: Lanista Auto Teambattle
 
 on:
   schedule:
-    # Kör var 10:e minut, dygnet runt (00–23 UTC)
-    - cron: "*/10 * * * *"
-  workflow_dispatch:  # Möjliggör manuell start
+    - cron: "* * * * *"   # varje minut, dygnet runt
+  workflow_dispatch:
 
 jobs:
   run-teambattle:
@@ -19,14 +18,19 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install selenium webdriver-manager
+        run: pip install -r requirements.txt
 
       - name: Run Lanista Auto Clicker
         env:
           EMAIL: ${{ secrets.EMAIL }}
           PASSWORD: ${{ secrets.PASSWORD }}
-        run: |
-          python main.py
+        run: python main.py
