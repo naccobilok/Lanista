@@ -1,5 +1,6 @@
 import os
 import time
+import random
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
@@ -26,9 +27,6 @@ def main():
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
-    options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0 Safari/537.36"
-    )
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
@@ -73,16 +71,15 @@ def main():
         create_button.click()
         print("SUCCESS: 'Skapa lagspel' clicked!")
 
+        # ---------- Slumpad väntetid innan exit ----------
+        delay = random.randint(420, 540)  # 7–9 minuter i sekunder
+        print(f"Waiting {delay/60:.1f} minutes before exit...")
+        time.sleep(delay)
+
     except Exception as e:
         print("ERROR:", type(e).__name__, e)
-        try:
-            driver.save_screenshot("error_screenshot.png")
-            print("Saved screenshot to error_screenshot.png")
-        except:
-            pass
     finally:
         driver.quit()
-
 
 if __name__ == "__main__":
     main()
